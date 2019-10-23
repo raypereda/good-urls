@@ -32,10 +32,6 @@ def url2text(url):
     return readable_text
 
 
-# good_urls = ['2appstudio.com', 'Blurb.com']
-url = 'https://epublisher.world/en/'
-print(url2text(url))
-
 for line in sys.stdin:
     label, url = line.split(",", 1)
     # print("label", label)
