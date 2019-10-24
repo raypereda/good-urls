@@ -5,7 +5,7 @@
 - [Background Preprocessing the Input Text](#background-preprocessing-the-input-text)
 - [Estimating Accuracy on Unseen](#estimating-accuracy-on-unseen)
 - [Making Predictions Using the Neural Network](#making-predictions-using-the-neural-network)
-- [Assembling the Annual Money Laundering Report](#assembling-the-annual-money-laundering-report)
+- [Assembling the Report](#assembling-the-report)
 
 ## Introduction
 
@@ -170,7 +170,7 @@ todo
 If the probability is larger than one, as in 1.00001, that is a minor rounding
 error in fastText. Don't worry about it.
 
-## Assembling the Annual Money Laundering Report
+## Assembling the Report
 
 We will simply append two columns to the input file. 
 
