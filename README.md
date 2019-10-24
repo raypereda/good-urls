@@ -3,7 +3,7 @@
 - [Introduction](#introduction)
 - [Setting up fastText](#setting-up-fasttext)
 - [Background Preprocessing the Input Text](#background-preprocessing-the-input-text)
-- [Estimating Accuracy on Unseen Wires](#estimating-accuracy-on-unseen-wires)
+- [Estimating Accuracy on Unseen](#estimating-accuracy-on-unseen)
 - [Making Predictions Using the Neural Network](#making-predictions-using-the-neural-network)
 - [Assembling the Annual Money Laundering Report](#assembling-the-annual-money-laundering-report)
 
@@ -112,7 +112,7 @@ line = strings.ReplaceAll(line, "9", "@")
 
 ```
 
-## Estimating Accuracy on Unseen Wires
+## Estimating Accuracy on Unseen
 
 The standard way to do this is to split off part of the training
 data and save it for testing. 
@@ -172,8 +172,7 @@ error in fastText. Don't worry about it.
 
 ## Assembling the Annual Money Laundering Report
 
-We will simply append two columns to the input file. The input file is a CSV file of wires.
-
+We will simply append two columns to the input file. 
 
 ```bash
 $ rowcut -c=1 urls.csv | \                      # cuts out the 2nd column, url text
@@ -182,7 +181,7 @@ $ rowcut -c=1 urls.csv | \                      # cuts out the 2nd column, url t
   cut -c 10- \                                  # removes the __label__ prefix
   | tr " " ","  > predictions.csv               # makes a valid csv
 
-# this combines two input wires CSV and the predictions CSV
+# this combines two input CSV and the predictions CSV
 $ rowpaste urls.csv predictions.csv  > urls-with-predictions.csv
 
 ```
