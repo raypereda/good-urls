@@ -137,7 +137,7 @@ real    0m1.908s
 user    0m0.015s
 sys     0m0.094s
 
-$ time fasttext test model_mapping-.bin training-ns-tail358.prn
+$ time fasttext test model_goodness-.bin training-ns-tail358.prn
 N       357
 P@1     0.969
 R@1     0.969
@@ -147,7 +147,7 @@ real    0m1.604s
 user    0m0.015s
 sys     0m0.094s
 
-$ time fasttext predict-prob model_mapping.bin training-ns-predict.prn > prediction-prod-on-model.txt
+$ time fasttext predict-prob model_goodness.bin training-ns-predict.prn > prediction-prod-on-model.txt
 
 real    0m2.153s
 user    0m0.062s
