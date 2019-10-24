@@ -55,22 +55,18 @@ $ ls -1sh
 | file                          | purpose                                                 |
 | ----------------------------- | ------------------------------------------------------- |
 | training.xlsx                 | unformatted training data used from the MLR 2018 Report |
-| training.prn                  | contains ORG and Country columns from the previous file |
-| training-n.prn                | previous normalized file                                |
-| training-ns.prn               | shuffled lines of the previous file                     |
-| model_mapping.bin             | neural network created during training                  |
-| model_mapping.vec             | dictionary created during training                      |
-| prediction-prod-on-model4.txt | prediction on the training data; 99% accurate           |
+| model_goodness.bin            | neural network created during training                  |
+| model_goodness.vec            | dictionary created during training                      |
+| prediction-model??.txt        | prediction on the training data; should be 99% accurate |
 
 1. the initial human vetted training data: training.xlsx
 2. created using Excel to narrow down to this file: training.prn
 3. `cat training.prn | normalize > training-n.prn`
 4. `shuffle training-n.prn > training-ns.prn`
-5. `fasttext supervised -input training-ns.prn -output model_mapping -lr 1.0 -epoch 25 -wordNgrams 2`
-   That creates two files: model_mapping.{bin, vec}.
-6. `fasttext test model_mapping.bin training-ns.prn`
-   This measure the accuracy of the model. In this case, the network learned 99.7% of
-   the examples.
+5. `fasttext supervised -input training-ns.prn -output model_goodness -lr 1.0 -epoch 25 -wordNgrams 2`
+   That creates two files: model_goodness.{bin, vec}.
+6. `fasttext test model_goodness.bin training-ns.prn`
+   This measures the accuracy of the model. 
 
 ## Background Preprocessing the Input Text
 
@@ -119,19 +115,19 @@ line = strings.ReplaceAll(line, "9", "@")
 ## Estimating Accuracy on Unseen Wires
 
 The standard way to do this is to split off part of the training
-data and save it for testing. In this case, we split off the last
-358 wires for testing and train on 13K wires. There are 13,358 wires
-for training; one per line of text file. The text needs to be normalized.
+data and save it for testing. 
 
 `P@1` and `R@1` are precision and recall for one label, namely country.
 Because there is only one label, precision and recall are the same.
 We can more call it in this case accuracy.
 
 ```bash
-$ head -13000 training-ns.prn > training-ns-head13k.prn
-$ tail -358 training-ns.prn > training-ns-tail358.prn
+$ head -13000 training-ns.prn > training-ns-head.prn
+$ tail -358 training-ns.prn > training-ns-tail.prn
 
-$ time fasttext test model_mapping.bin training-ns-head13k.prn
+$ time fasttext test model_goodness.bin training-ns-head.prn
+replace later
+
 N       13000
 P@1     0.996
 R@1     0.996
@@ -159,16 +155,10 @@ sys     0m0.108s
 
 ```
 
-So, we estimate 96.9% accuracy on unseen wires. That is good. With more
-training data, we can probably do even better.
-
 ## Making Predictions Using the Neural Network
 
-The ORG field is all that needed to make predictions. Put that in a UTF-8 file,
-with Unix-style end-of-line, CR. Normalize the text using the command-line tool.
-
 ```bash
-fasttext predict-prob model_mapping.bin goodness.prn > ???
+fasttext predict-prob model_goodness.bin goodness.prn > ???
 ```
 
 Here sample of the output file:
@@ -177,26 +167,22 @@ Here sample of the output file:
 todo
 ```
 
-Each row has a label country. It is Germany for the first wire. 0.996884 is the confidence
-probability. If the probability is larger than one, as in 1.00001, that is a minor rounding
+If the probability is larger than one, as in 1.00001, that is a minor rounding
 error in fastText. Don't worry about it.
 
 ## Assembling the Annual Money Laundering Report
 
 We will simply append two columns to the input file. The input file is a CSV file of wires.
-The output columns will be Country and Confidence. The country is the predicted country given the
-organization column. Confidence is a probability value that estimates the confidence
-in the correctness of the country prediction.
 
 
 ```bash
-$ rowcut -c=6 wires-100.csv | \                 # cuts out the 6h column, organization
+$ rowcut -c=1 urls.csv | \                      # cuts out the 2nd column, url text
   normalize -l=0 | \                            # normalizes the text
   fasttext predict-prob model_goodness.bin - | \ # run fasttext
   cut -c 10- \                                  # removes the __label__ prefix
   | tr " " ","  > predictions.csv               # makes a valid csv
 
 # this combines two input wires CSV and the predictions CSV
-$ rowpaste urls.csv predictions.csv  > wires-with-predictions.csv
+$ rowpaste urls.csv predictions.csv  > urls-with-predictions.csv
 
 ```
